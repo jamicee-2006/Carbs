@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CARBS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#EDF3F6; --surface:#FFFFFF; --ink:#0E2A3A; --muted:#4A6676; --line:#D2DFE6; --edge:#7F9AA9;
+  --accent:#0A7EA4; --accent-ink:#FFFFFF; --focus:#0A7EA4;
+  --stop-bg:#B3261E; --stop-fg:#FFFFFF;
+  --ok:#157347; --warn:#8F5600;
+  --meter-bg:#0E2A3A; --meter-text:#E6F1F5; --meter-dim:#8FA9B7; --meter-fg:#FFC83D; --meter-edge:#0E2A3A;
+  --font-display:'Space Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --bg:#08171F; --surface:#10252F; --ink:#E6F1F5; --muted:#93AEBB; --line:#21404F; --edge:#56788A;
+    --accent:#4FC3E8; --accent-ink:#04202C; --focus:#4FC3E8;
+    --stop-bg:#FF8A80; --stop-fg:#3A0A07;
+    --ok:#5BD08A; --warn:#F2B14C;
+    --meter-bg:#050F16; --meter-edge:#21404F;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5}
+h1,h2,h3,p{margin:0}
+h2{font-family:var(--font-display);font-size:20px;line-height:1.25;text-wrap:balance}
+button,input,textarea,select{font:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding-block:16px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:.04em}
+.tabs,.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tab,.chip{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--edge);background:transparent;color:var(--ink);cursor:pointer;font-size:14px;font-weight:500}
+.tab[aria-pressed="true"],.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip{min-height:36px;padding:0 12px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:14px}
+input,textarea,select{width:100%;min-height:48px;padding:12px;border-radius:10px;border:1px solid var(--edge);background:var(--bg);color:var(--ink)}
+textarea{min-height:84px;resize:vertical}
+.hint{color:var(--muted);font-size:14px}
+.msg{font-size:14px;color:var(--stop-bg)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:10px;border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;text-align:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--edge)}
+.btn.stop{background:var(--stop-bg);color:var(--stop-fg)}
+.btn.sm{min-height:40px;padding:0 14px;font-size:14px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.linkbtn{background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:6px 0;font-size:14px;text-align:left}
+.notice{padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.stat{color:var(--muted);font-size:15px}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.list{display:flex;flex-direction:column;gap:12px}
+.empty{color:var(--muted);padding:18px;border:1px dashed var(--edge);border-radius:12px;font-size:15px}
+.who-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+
+.meter{background:var(--meter-bg);color:var(--meter-text);border:1px solid var(--meter-edge);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.meter-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--meter-dim)}
+.rate-pill{font-family:var(--font-mono);letter-spacing:.04em;text-transform:none;font-size:13px;color:var(--meter-fg);border:1px solid var(--meter-dim);border-radius:999px;padding:2px 10px}
+.job{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:36px;font-size:15px}
+.job span{min-width:0;overflow-wrap:anywhere}
+.lcd{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--meter-fg);line-height:1;font-weight:500}
+#clock{font-size:clamp(56px,20vw,96px)}
+#amount{font-size:clamp(36px,12vw,60px)}
+.readout{display:flex;flex-direction:column;gap:10px}
+.billed{color:var(--meter-dim);font-size:14px}
+.go{width:100%;min-height:68px;font-size:24px;font-family:var(--font-display);letter-spacing:.02em}
+.meter-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mbtn{min-height:44px;background:transparent;border:1px solid var(--meter-dim);color:var(--meter-text);border-radius:10px;font-size:14px;cursor:pointer}
+.mbtn.armed{border-color:var(--meter-fg);color:var(--meter-fg)}
+.mlink{background:none;border:0;color:var(--meter-text);text-decoration:underline;cursor:pointer;padding:6px 0;font-size:14px}
+.meter details summary{cursor:pointer;color:var(--meter-dim);font-size:14px;min-height:32px}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:10px}
+.settings label{font-size:13px;color:var(--meter-dim);display:block;margin-bottom:4px}
+.settings input,.settings select{background:transparent;color:var(--meter-text);border-color:var(--meter-dim)}
+.settings select option{color:#0E2A3A}
+
+.bk{gap:10px}
+.bk.active{border:2px solid var(--accent)}
+.bk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.when{font-family:var(--font-display);font-weight:700;font-size:17px}
+.pill{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.pending{color:var(--warn)} .pill.confirmed{color:var(--accent)} .pill.done{color:var(--ok)} .pill.cancelled{color:var(--muted)}
+.meta{display:flex;flex-direction:column;gap:2px;font-size:15px;min-width:0}
+.who{font-weight:600}
+.addr{white-space:pre-wrap;overflow-wrap:anywhere}
+.lnk{color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.paid{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+details.people summary{cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:18px;min-height:32px}
+.person{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
+.toast{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;pointer-events:none;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.toast span{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;max-width:100%}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 2.5c3.6 4.3 6 7.4 6 10.6a6 6 0 0 1-12 0c0-3.2 2.4-6.3 6-10.6z" fill="var(--accent)"/><path d="M9 14a3 3 0 0 0 2.4 2.9" fill="none" stroke="var(--surface)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>CARBS</span>
+    </div>
+    <div class="tabs" id="tabs" hidden>
+      <button class="tab" id="tab-owner" type="button" aria-pressed="true">Dashboard</button>
+      <button class="tab" id="tab-cust" type="button" aria-pressed="false">Book a wash</button>
+    </div>
+  </header>
+
+  <p class="notice" id="status" role="status">Loading…</p>
+
+  <!-- SIGN IN / SIGN UP -->
+  <section id="v-auth" class="card" hidden>
+    <div class="tabs">
+      <button class="tab" id="m-login" type="button" aria-pressed="true">Log in</button>
+      <button class="tab" id="m-signup" type="button" aria-pressed="false">Register</button>
+    </div>
+    <p class="hint">We wash your car where it is parked. Charged per minute: <strong class="ratetext">per minute</strong>.</p>
+    <form id="authform" class="form" novalidate>
+      <div class="field" id="f-name" hidden><label for="aname">Your name</label><input id="aname" type="text" autocomplete="name" maxlength="80"></div>
+      <div class="field" id="f-phone" hidden><label for="aphone">Phone number</label><input id="aphone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="0803 000 0000"></div>
+      <div class="field"><label for="aemail">Email</label><input id="aemail" type="email" autocomplete="email" maxlength="120" required></div>
+      <div class="field"><label for="apass">Password</label><input id="apass" type="password" autocomplete="current-password" minlength="6" maxlength="100" required><p class="hint" id="passhint" hidden>At least 6 characters.</p></div>
+      <p class="msg" id="authmsg" role="alert"></p>
+      <button class="btn primary" id="authbtn" type="submit">Log in</button>
+      <button class="linkbtn" id="forgot" type="button">Forgot password?</button>
+    </form>
+  </section>
+
+  <!-- COMPLETE PROFILE (rare fallback) -->
+  <section id="v-profile" class="card" hidden>
+    <h2>One more step</h2>
+    <p class="hint">Tell us your name and phone number so we can reach you.</p>
+    <form id="profform" class="form" novalidate>
+      <div class="field"><label for="pname">Your name</label><input id="pname" type="text" autocomplete="name" maxlength="80"></div>
+      <div class="field"><label for="pphone">Phone number</label><input id="pphone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20"></div>
+      <p class="msg" id="profmsg" role="alert"></p>
+      <button class="btn primary" type="submit">Save</button>
+    </form>
+  </section>
+
+  <!-- CUSTOMER -->
+  <section id="v-customer" class="stack" hidden>
+    <div class="who-bar"><span id="whoami"></span><button class="linkbtn" id="logout1" type="button">Log out</button></div>
+    <div class="notice" id="verifybox" hidden>
+      <p id="verifytext">Please verify your email using the link we sent you.</p>
+      <div class="actions" style="margin-top:8px">
+        <button class="btn ghost sm" id="resend" type="button">Send link again</button>
+        <button class="btn ghost sm" id="recheck" type="button">I have verified</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 id="hello">Book a wash</h2>
+      <p class="hint">Charged per minute of washing (<span class="ratetext">per minute</span>), timed at your car.</p>
+      <form id="bookform" class="form" novalidate>
+        <div class="field"><label for="car">Car</label><input id="car" type="text" maxlength="80" placeholder="Toyota Camry, silver, LND 123 AB" required></div>
+        <div class="row2">
+          <div class="field"><label for="bdate">Date</label><input id="bdate" type="date" required></div>
+          <div class="field"><label for="btime">Time</label><input id="btime" type="time" required></div>
+        </div>
+        <div class="field"><label for="addr">Where is the car?</label><textarea id="addr" maxlength="300" placeholder="House number, street, area, nearest landmark or bus stop" required></textarea></div>
+        <div class="field">
+          <label>Share my exact location</label>
+          <button class="btn ghost" id="geobtn" type="button">Use my current location</button>
+          <p class="hint" id="geomsg">Best if you are far from our shop. Do this where the car is parked.</p>
+        </div>
+        <div class="field"><label for="maplink">Map link (optional)</label><input id="maplink" type="text" maxlength="300" placeholder="Paste a Google Maps link"></div>
+        <div class="field"><label for="note">Note (optional)</label><input id="note" type="text" maxlength="160" placeholder="Gate colour, parking level, anything useful"></div>
+        <p class="msg" id="bookmsg" role="alert"></p>
+        <button class="btn primary" id="bookbtn" type="submit">Book wash</button>
+      </form>
+    </div>
+    <div class="sec-head"><h2>Your bookings</h2></div>
+    <div class="list" id="mybookings"></div>
+  </section>
+
+  <!-- OWNER -->
+  <section id="v-owner" class="stack" hidden>
+    <div class="who-bar"><span id="ownerwho"></span><button class="linkbtn" id="logout2" type="button">Log out</button></div>
+    <section class="meter" aria-label="Wash timer">
+      <div class="meter-head"><span>Wash meter</span><span class="rate-pill" id="ratepill">₦200 / min</span></div>
+      <div class="job"><span id="jobtext">Quick wash, no booking selected</span><button class="mlink" id="clearjob" type="button" hidden>Clear</button></div>
+      <div class="readout">
+        <div class="lcd" id="clock" role="timer" aria-label="Elapsed time">00:00</div>
+        <div class="lcd" id="amount" aria-label="Amount to charge">₦0</div>
+        <div class="billed" id="billed">0 minutes billed</div>
+      </div>
+      <button class="btn go primary" id="go" type="button">Start</button>
+      <div class="meter-btns">
+        <button class="mbtn" id="reset" type="button">Reset</button>
+        <button class="mbtn" id="minus" type="button">−1 min</button>
+        <button class="mbtn" id="plus" type="button">+1 min</button>
+      </div>
+      <button class="btn primary" id="record" type="button" hidden>Record wash</button>
+      <details>
+        <summary>Rate settings</summary>
+        <div class="settings">
+          <div><label for="rate">Naira per minute</label><input id="rate" type="number" min="0" step="50" inputmode="numeric"></div>
+          <div><label for="round">Charging</label>
+            <select id="round"><option value="up">Every started minute</option><option value="full">Full minutes only</option></select>
+          </div>
+        </div>
+      </details>
+    </section>
+    <p class="stat" id="todaystat">No washes recorded today yet.</p>
+    <div class="sec-head">
+      <h2>Bookings</h2>
+      <div class="chips" id="chips">
+        <button class="chip" type="button" data-f="open" aria-pressed="true">Open</button>
+        <button class="chip" type="button" data-f="done" aria-pressed="false">Done</button>
+        <button class="chip" type="button" data-f="all" aria-pressed="false">All</button>
+      </div>
+    </div>
+    <div class="list" id="queue"></div>
+    <details class="card people">
+      <summary>Customers <span id="pcount" class="hint"></span></summary>
+      <div id="people"></div>
+    </details>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toasttext"></span></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+         signOut, sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, addDoc, updateDoc, collection, onSnapshot, query, where, orderBy, limit,
+         writeBatch, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// Who the owner is gets decided by the security rules in Firebase, not by this file.
+const DEFAULT_RATE = 200; // naira per minute
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD2kEMc2tIoxJfDilruCgOwtSAgH6yi2Gs",
+  authDomain: "carbs-bd6ad.firebaseapp.com",
+  projectId: "carbs-bd6ad",
+  storageBucket: "carbs-bd6ad.firebasestorage.app",
+  messagingSenderId: "153104629967",
+  appId: "1:153104629967:web:cf542acfca54b4b8fa37ba"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+const LABEL = {pending:'Pending', confirmed:'Confirmed', done:'Done', cancelled:'Cancelled'};
+
+let user = null, isOwner = false, ownerTab = 'dashboard', filter = 'open', authMode = 'login';
+let profile = null, myBookings = [], allBookings = [], customers = {}, sessions = [];
+let pubRate = DEFAULT_RATE, timer = defaultTimer();
+let unsubs = [], busy = false, resetArmed = false, resetTimeout = null, toastTimeout = null;
+let timerChain = Promise.resolve(), geo = null;
+
+function defaultTimer(){ return {running:false, startedAt:null, accMs:0, rate:DEFAULT_RATE, roundUp:true, customerId:null, bookingId:null}; }
+function el(tag, props, ...kids){
+  const n = document.createElement(tag); props = props || {};
+  for (const k in props){
+    const v = props[k];
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, '');
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  kids.forEach(c => { if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(String(c))); });
+  return n;
+}
+const naira = n => '₦' + Math.round(n || 0).toLocaleString('en-NG');
+const pad = n => n < 10 ? '0' + n : '' + n;
+function fmtClock(ms){
+  const s = Math.floor(Math.max(0, ms) / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  return (h > 0 ? h + ':' + pad(m) : pad(m)) + ':' + pad(s % 60);
+}
+function billedMinutes(ms, roundUp){ const s = Math.floor(Math.max(0, ms) / 1000); return roundUp ? Math.ceil(s / 60) : Math.floor(s / 60); }
+const fmtWhen = ms => new Date(ms).toLocaleString('en-NG', {weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit'});
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+function toast(msg){
+  $('toasttext').textContent = msg; $('toast').hidden = false;
+  clearTimeout(toastTimeout); toastTimeout = setTimeout(() => { $('toast').hidden = true; }, 3800);
+}
+function setStatus(msg){ const s = $('status'); if (msg){ s.textContent = msg; s.hidden = false; } else s.hidden = true; }
+function dbErr(e){
+  const code = e && e.code || '';
+  if (code.includes('permission-denied')) toast('Not allowed. Log in again, or contact the owner if this keeps happening.');
+  else if (code.includes('unavailable')) toast('No connection. Check your internet and try again.');
+  else toast('Something went wrong' + (code ? ' (' + code + ')' : '') + '. Try again.');
+}
+function authText(e){
+  const c = e && e.code || '';
+  if (c === 'auth/email-already-in-use') return 'That email is already registered. Log in instead.';
+  if (c === 'auth/invalid-email') return 'Enter a valid email address.';
+  if (c === 'auth/weak-password') return 'Use a password of at least 6 characters.';
+  if (c === 'auth/invalid-credential' || c === 'auth/wrong-password' || c === 'auth/user-not-found') return 'Wrong email or password.';
+  if (c === 'auth/too-many-requests') return 'Too many tries. Wait a few minutes and try again.';
+  if (c === 'auth/network-request-failed') return 'No connection. Check your internet and try again.';
+  if (c === 'auth/operation-not-allowed') return 'Email login is not switched on yet in Firebase. The owner must enable Email/Password.';
+  return 'Could not complete that. Try again.';
+}
+function mapsUrl(b){
+  if (typeof b.lat === 'number' && typeof b.lng === 'number') return 'https://www.google.com/maps/search/?api=1&query=' + b.lat + ',' + b.lng;
+  const link = (b.mapLink || '').trim();
+  if (/^https:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps|(www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+)/i.test(link)) return link;
+  const a = (b.address || '').trim();
+  return a ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a) : null;
+}
+const isOpen = b => b.status === 'pending' || b.status === 'confirmed';
+const telHref = p => 'tel:' + String(p || '').replace(/[^0-9+]/g, '');
+
+/* ---------- sign in / up ---------- */
+function setMode(m){
+  authMode = m;
+  const up = m === 'signup';
+  $('m-login').setAttribute('aria-pressed', up ? 'false' : 'true');
+  $('m-signup').setAttribute('aria-pressed', up ? 'true' : 'false');
+  $('f-name').hidden = !up; $('f-phone').hidden = !up; $('passhint').hidden = !up;
+  $('apass').autocomplete = up ? 'new-password' : 'current-password';
+  $('authbtn').textContent = up ? 'Create my account' : 'Log in';
+  $('forgot').hidden = up; $('authmsg').textContent = '';
+}
+const validPhone = p => /^\+?[0-9]{7,15}$/.test(p.replace(/[\s-]/g, ''));
+$('m-login').addEventListener('click', () => setMode('login'));
+$('m-signup').addEventListener('click', () => setMode('signup'));
+$('authform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = $('aemail').value.trim().toLowerCase(), pass = $('apass').value, msg = $('authmsg');
+  msg.textContent = '';
+  if (!email || !pass){ msg.textContent = 'Enter your email and password.'; return; }
+  let name = '', phone = '';
+  if (authMode === 'signup'){
+    name = $('aname').value.trim(); phone = $('aphone').value.trim();
+    if (!name){ msg.textContent = 'Enter your name.'; return; }
+    if (!validPhone(phone)){ msg.textContent = 'Enter a valid phone number, digits only.'; return; }
+  }
+  $('authbtn').disabled = true;
+  try {
+    if (authMode === 'signup'){
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      try { await setDoc(doc(db, 'customers', cred.user.uid), {name, phone, email, createdAt: Date.now()}); } catch (err) { dbErr(err); }
+      try { await sendEmailVerification(cred.user); } catch (err) { /* shown later with a resend button */ }
+    } else {
+      await signInWithEmailAndPassword(auth, email, pass);
+    }
+  } catch (err) { msg.textContent = authText(err); }
+  $('authbtn').disabled = false;
+});
+$('forgot').addEventListener('click', async () => {
+  const email = $('aemail').value.trim().toLowerCase(), msg = $('authmsg');
+  if (!email){ msg.textContent = 'Type your email above first, then tap Forgot password.'; return; }
+  try { await sendPasswordResetEmail(auth, email); msg.textContent = ''; toast('If that email is registered, a reset link is on its way.'); }
+  catch (err) { msg.textContent = authText(err); }
+});
+const doLogout = () => signOut(auth);
+$('logout1').addEventListener('click', doLogout);
+$('logout2').addEventListener('click', doLogout);
+
+$('profform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('pname').value.trim(), phone = $('pphone').value.trim(), msg = $('profmsg');
+  msg.textContent = '';
+  if (!name){ msg.textContent = 'Enter your name.'; return; }
+  if (!validPhone(phone)){ msg.textContent = 'Enter a valid phone number, digits only.'; return; }
+  try { await setDoc(doc(db, 'customers', user.uid), {name, phone, email: user.email, createdAt: Date.now()}); }
+  catch (err) { msg.textContent = 'Could not save. Try again.'; }
+});
+
+/* ---------- views ---------- */
+function showView(){
+  $('v-auth').hidden = true; $('v-profile').hidden = true; $('v-customer').hidden = true; $('v-owner').hidden = true;
+  $('tabs').hidden = true;
+  if (!user){ $('v-auth').hidden = false; return; }
+  if (isOwner){
+    $('tabs').hidden = false;
+    const dash = ownerTab === 'dashboard';
+    $('v-owner').hidden = !dash; $('v-customer').hidden = dash;
+    $('tab-owner').setAttribute('aria-pressed', dash ? 'true' : 'false');
+    $('tab-cust').setAttribute('aria-pressed', dash ? 'false' : 'true');
+    return;
+  }
+  if (!profile){ $('v-profile').hidden = false; return; }
+  $('v-customer').hidden = false;
+}
+$('tab-owner').addEventListener('click', () => { ownerTab = 'dashboard'; showView(); });
+$('tab-cust').addEventListener('click', () => { ownerTab = 'customer'; showView(); });
+function renderRate(){
+  const r = isOwner ? timer.rate : pubRate;
+  document.querySelectorAll('.ratetext').forEach(n => { n.textContent = naira(r) + ' per minute'; });
+}
+
+/* ---------- booking cards ---------- */
+async function setBookingStatus(id, status){
+  try { await updateDoc(doc(db, 'bookings', id), {status}); } catch (e) { dbErr(e); }
+}
+function bookingCard(b, owner){
+  const active = owner && timer.bookingId === b.id;
+  const card = el('article', {class:'card bk' + (active ? ' active' : '')});
+  card.append(el('div', {class:'bk-top'}, el('div', {class:'when', text: fmtWhen(b.whenMs)}), el('span', {class:'pill ' + b.status, text: LABEL[b.status] || b.status})));
+  const meta = el('div', {class:'meta'});
+  if (owner){
+    meta.append(el('div', {class:'who', text: b.name || 'Customer'}));
+    if (b.phone) meta.append(el('div', {}, el('span', {text: b.phone}), ' ', el('a', {class:'lnk', href: telHref(b.phone), text:'Call'})));
+  }
+  meta.append(el('div', {text: b.car}));
+  meta.append(el('div', {class:'addr', text: b.address}));
+  if (typeof b.lat === 'number') meta.append(el('div', {class:'hint', text:'Exact location shared from phone'}));
+  if (b.note) meta.append(el('div', {class:'hint', text:'Note: ' + b.note}));
+  if (b.status === 'done' && b.charge != null) meta.append(el('div', {class:'paid', text: b.minutes + ' min · ' + naira(b.charge)}));
+  card.append(meta);
+  const actions = el('div', {class:'actions'});
+  if (owner){
+    const url = mapsUrl(b);
+    if (url) actions.append(el('a', {class:'btn ghost sm', href:url, target:'_blank', rel:'noopener noreferrer', text:'Open in Maps'}));
+    if (b.status === 'pending') actions.append(el('button', {class:'btn primary sm', type:'button', text:'Confirm', onclick: () => setBookingStatus(b.id, 'confirmed')}));
+    if (isOpen(b)){
+      if (active) actions.append(el('span', {class:'pill confirmed', text:'On the timer'}));
+      else actions.append(el('button', {class:'btn ghost sm', type:'button', text:'Use for timer', onclick: () => pickJob(b.id)}));
+      actions.append(el('button', {class:'btn ghost sm', type:'button', text:'Cancel', onclick: () => setBookingStatus(b.id, 'cancelled')}));
+    }
+  } else if (isOpen(b)){
+    actions.append(el('button', {class:'btn ghost sm', type:'button', text:'Cancel booking', onclick: () => setBookingStatus(b.id, 'cancelled')}));
+  }
+  if (actions.children.length) card.append(actions);
+  return card;
+}
+
+/* ---------- customer ---------- */
+function renderCustomer(){
+  if (!user) return;
+  $('whoami').textContent = (profile && profile.name ? profile.name + ' · ' : '') + (user.email || '');
+  $('hello').textContent = profile && profile.name ? 'Hi, ' + profile.name : 'Book a wash';
+  const vb = $('verifybox');
+  vb.hidden = user.emailVerified || isOwner;
+  const list = $('mybookings'); list.replaceChildren();
+  const bs = myBookings.slice().sort((a, b) => b.whenMs - a.whenMs);
+  if (!bs.length){ list.append(el('div', {class:'empty', text:'No bookings yet. Fill the form above to book your first wash.'})); return; }
+  bs.forEach(b => list.append(bookingCard(b, false)));
+}
+$('resend').addEventListener('click', async () => {
+  try { await sendEmailVerification(user); toast('Verification link sent. Check your inbox and spam.'); }
+  catch (e) { toast('Could not send yet. Wait a minute and try again.'); }
+});
+$('recheck').addEventListener('click', async () => {
+  try { await user.reload(); } catch (e) {}
+  startSession(auth.currentUser);
+});
+$('geobtn').addEventListener('click', () => {
+  const m = $('geomsg');
+  if (!navigator.geolocation){ m.textContent = 'This phone or browser cannot share location. Type the address instead.'; return; }
+  m.textContent = 'Getting your location…';
+  navigator.geolocation.getCurrentPosition(p => {
+    geo = {lat: Math.round(p.coords.latitude * 1e6) / 1e6, lng: Math.round(p.coords.longitude * 1e6) / 1e6};
+    m.textContent = 'Location captured (accurate to about ' + Math.round(p.coords.accuracy) + ' m). Still add the address and landmark below.';
+  }, err => {
+    geo = null;
+    m.textContent = err.code === 1 ? 'Location is blocked. Allow location for this site in your browser, or type the address and paste a map link.' : 'Could not get your location. Type the address instead.';
+  }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+});
+$('bookform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const car = $('car').value.trim(), date = $('bdate').value, time = $('btime').value;
+  const address = $('addr').value.trim(), mapLink = $('maplink').value.trim(), note = $('note').value.trim(), msg = $('bookmsg');
+  msg.textContent = '';
+  if (!car){ msg.textContent = 'Tell us which car to wash.'; return; }
+  if (!date || !time){ msg.textContent = 'Pick a date and time.'; return; }
+  const whenMs = new Date(date + 'T' + time).getTime();
+  if (isNaN(whenMs) || whenMs < Date.now()){ msg.textContent = 'Pick a time that has not passed yet.'; return; }
+  if (!address){ msg.textContent = 'Tell us where the car is.'; return; }
+  const data = {uid:user.uid, name:(profile && profile.name) || '', phone:(profile && profile.phone) || '', car, whenMs, address,
+    lat: geo ? geo.lat : null, lng: geo ? geo.lng : null, mapLink, note, status:'pending', createdAt: Date.now()};
+  $('bookbtn').disabled = true;
+  try {
+    await addDoc(collection(db, 'bookings'), data);
+    $('bookform').reset(); geo = null; $('geomsg').textContent = 'Best if you are far from our shop. Do this where the car is parked.';
+    toast('Booked. We will confirm soon.');
+  } catch (err) { dbErr(err); msg.textContent = 'Booking did not save. Try again.'; }
+  $('bookbtn').disabled = false;
+});
+
+/* ---------- owner: queue, people, today ---------- */
+function renderQueue(){
+  const counts = {open:0, done:0, all:allBookings.length};
+  allBookings.forEach(b => { if (isOpen(b)) counts.open++; else if (b.status === 'done') counts.done++; });
+  [...$('chips').children].forEach(ch => {
+    const f = ch.dataset.f;
+    ch.textContent = (f === 'open' ? 'Open' : f === 'done' ? 'Done' : 'All') + ' ' + counts[f];
+    ch.setAttribute('aria-pressed', f === filter ? 'true' : 'false');
+  });
+  const shown = allBookings.filter(b => filter === 'all' || (filter === 'open' ? isOpen(b) : b.status === 'done'));
+  shown.sort((a, b) => filter === 'open' ? a.whenMs - b.whenMs : b.whenMs - a.whenMs);
+  const q = $('queue'); q.replaceChildren();
+  if (!shown.length){ q.append(el('div', {class:'empty', text: filter === 'open' ? 'No open bookings. New ones from customers appear here with their location.' : 'Nothing here yet.'})); return; }
+  shown.forEach(b => q.append(bookingCard(b, true)));
+}
+function renderPeople(){
+  const ids = Object.keys(customers).filter(id => customers[id].name).sort((a, b) => customers[a].name.localeCompare(customers[b].name));
+  $('pcount').textContent = '(' + ids.length + ')';
+  const box = $('people'); box.replaceChildren();
+  if (!ids.length){ box.append(el('p', {class:'hint', text:'Registered customers will be listed here.'})); return; }
+  ids.forEach(id => {
+    const c = customers[id], n = allBookings.filter(b => b.uid === id).length;
+    box.append(el('div', {class:'person'},
+      el('div', {}, el('div', {class:'who', text:c.name}), el('div', {class:'hint', text: n + (n === 1 ? ' booking' : ' bookings')})),
+      el('div', {}, c.phone ? el('span', {text:c.phone}) : null, c.phone ? ' ' : null, c.phone ? el('a', {class:'lnk', href: telHref(c.phone), text:'Call'}) : null)));
+  });
+}
+function renderToday(){
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const t = sessions.filter(s => s.endedAt >= start.getTime());
+  const sum = t.reduce((a, s) => a + (s.amount || 0), 0);
+  $('todaystat').textContent = t.length ? 'Today: ' + t.length + (t.length === 1 ? ' wash' : ' washes') + ' recorded · ' + naira(sum) : 'No washes recorded today yet.';
+}
+
+/* ---------- owner: meter ---------- */
+const elapsed = () => timer.accMs + (timer.running ? Date.now() - timer.startedAt : 0);
+function saveTimer(){
+  const d = Object.assign({}, timer);
+  timerChain = timerChain.then(() => setDoc(doc(db, 'timer', 'state'), d)).catch(dbErr);
+  return timerChain;
+}
+function currentJob(){ return timer.bookingId ? allBookings.find(b => b.id === timer.bookingId) || null : null; }
+function tickMeter(){
+  if (!isOwner) return;
+  const ms = elapsed(), m = billedMinutes(ms, timer.roundUp), amt = m * timer.rate;
+  $('clock').textContent = fmtClock(ms);
+  $('amount').textContent = naira(amt);
+  $('billed').textContent = m + (m === 1 ? ' minute' : ' minutes') + ' billed';
+  $('record').textContent = 'Record wash · ' + naira(amt);
+}
+function renderMeter(){
+  const go = $('go');
+  go.textContent = timer.running ? 'Stop' : 'Start';
+  go.className = 'btn go ' + (timer.running ? 'stop' : 'primary');
+  $('ratepill').textContent = naira(timer.rate) + ' / min';
+  if (document.activeElement !== $('rate')) $('rate').value = timer.rate;
+  $('round').value = timer.roundUp ? 'up' : 'full';
+  const job = currentJob();
+  $('jobtext').textContent = job ? (job.name || 'Customer') + ' · ' + job.car : (timer.bookingId ? 'Selected booking' : 'Quick wash, no booking selected');
+  $('clearjob').hidden = !timer.bookingId;
+  $('record').hidden = timer.running || elapsed() <= 0;
+  $('reset').textContent = resetArmed ? 'Tap again to reset' : 'Reset';
+  $('reset').classList.toggle('armed', resetArmed);
+  tickMeter();
+}
+function pickJob(id){
+  if (timer.running || elapsed() > 0){ toast('Record or reset the current wash first.'); return; }
+  const b = allBookings.find(x => x.id === id); if (!b) return;
+  timer.customerId = b.uid; timer.bookingId = id; saveTimer(); renderMeter(); renderQueue();
+}
+$('go').addEventListener('click', () => {
+  if (timer.running){ timer.accMs = elapsed(); timer.running = false; timer.startedAt = null; }
+  else { timer.running = true; timer.startedAt = Date.now(); }
+  resetArmed = false; saveTimer(); renderMeter();
+});
+$('reset').addEventListener('click', () => {
+  if (!resetArmed){
+    resetArmed = true; renderMeter(); clearTimeout(resetTimeout);
+    resetTimeout = setTimeout(() => { resetArmed = false; renderMeter(); }, 3000);
+    return;
+  }
+  clearTimeout(resetTimeout); resetArmed = false;
+  timer.running = false; timer.startedAt = null; timer.accMs = 0;
+  saveTimer(); renderMeter(); toast('Timer reset.');
+});
+function adjust(delta){
+  const run = timer.running ? Date.now() - timer.startedAt : 0;
+  timer.accMs = Math.max(timer.accMs + delta, -run);
+  saveTimer(); renderMeter();
+}
+$('minus').addEventListener('click', () => adjust(-60000));
+$('plus').addEventListener('click', () => adjust(60000));
+$('clearjob').addEventListener('click', () => {
+  if (timer.running || elapsed() > 0){ toast('Record or reset the current wash first.'); return; }
+  timer.customerId = null; timer.bookingId = null; saveTimer(); renderMeter(); renderQueue();
+});
+$('rate').addEventListener('change', async () => {
+  const v = Number($('rate').value);
+  if (!isFinite(v) || v < 0){ $('rate').value = timer.rate; return; }
+  timer.rate = Math.round(v); renderMeter(); renderRate();
+  try { await setDoc(doc(db, 'settings', 'public'), {rate: timer.rate}); } catch (e) { dbErr(e); }
+  saveTimer();
+});
+$('round').addEventListener('change', () => { timer.roundUp = $('round').value === 'up'; saveTimer(); renderMeter(); });
+$('chips').addEventListener('click', e => { const f = e.target && e.target.dataset && e.target.dataset.f; if (f){ filter = f; renderQueue(); } });
+$('record').addEventListener('click', async () => {
+  if (busy || timer.running) return;
+  const ms = elapsed(); if (ms <= 0) return;
+  busy = true;
+  const mins = billedMinutes(ms, timer.roundUp), rate = timer.rate, amount = mins * rate, job = currentJob();
+  try {
+    const batch = writeBatch(db);
+    if (job) batch.update(doc(db, 'bookings', job.id), {status:'done', minutes:mins, rate, charge:amount, doneAt:Date.now()});
+    batch.set(doc(collection(db, 'sessions')), {customerId: job ? job.uid : null, bookingId: job ? job.id : null,
+      name: job ? job.name : 'Quick wash', car: job ? job.car : '', minutes: mins, rate, amount, endedAt: Date.now()});
+    timer = Object.assign(defaultTimer(), {rate, roundUp: timer.roundUp});
+    batch.set(doc(db, 'timer', 'state'), Object.assign({}, timer));
+    await batch.commit();
+    toast('Recorded ' + naira(amount) + ' for ' + mins + ' min.');
+  } catch (e) { dbErr(e); }
+  busy = false; renderMeter(); renderQueue();
+});
+setInterval(tickMeter, 250);
+
+/* ---------- data subscriptions ---------- */
+function stopSession(){ unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
+let sessionToken = 0;
+async function startSession(u){
+  stopSession();
+  const token = ++sessionToken;
+  user = u; isOwner = false;
+  profile = null; myBookings = []; allBookings = []; customers = {}; sessions = [];
+  if (!u){ setStatus(''); showView(); return; }
+  setStatus('Loading…');
+  if (u.emailVerified){
+    // Only the owner's verified account is allowed to read this document, so a successful read means owner.
+    try { await getDoc(doc(db, 'timer', 'state')); isOwner = true; } catch (e) { isOwner = false; }
+    if (token !== sessionToken) return;
+  }
+  setStatus('');
+  const err = e => dbErr(e);
+  unsubs.push(onSnapshot(doc(db, 'settings', 'public'), s => { if (s.exists() && typeof s.data().rate === 'number') pubRate = s.data().rate; renderRate(); }, err));
+  unsubs.push(onSnapshot(doc(db, 'customers', u.uid), s => { profile = s.exists() ? s.data() : null; showView(); renderCustomer(); }, err));
+  if (isOwner){
+    unsubs.push(onSnapshot(collection(db, 'bookings'), s => { allBookings = s.docs.map(d => Object.assign({id:d.id}, d.data())); renderQueue(); renderPeople(); renderMeter(); }, err));
+    unsubs.push(onSnapshot(collection(db, 'customers'), s => { customers = {}; s.docs.forEach(d => { customers[d.id] = d.data(); }); renderPeople(); }, err));
+    unsubs.push(onSnapshot(doc(db, 'timer', 'state'), s => {
+      timer = s.exists() ? Object.assign(defaultTimer(), s.data()) : defaultTimer();
+      renderMeter(); renderQueue(); renderRate();
+    }, err));
+    unsubs.push(onSnapshot(query(collection(db, 'sessions'), orderBy('endedAt', 'desc'), limit(300)), s => { sessions = s.docs.map(d => d.data()); renderToday(); }, err));
+    $('ownerwho').textContent = 'Owner · ' + u.email;
+  } else {
+    // customers read only their own bookings
+    unsubs.push(onSnapshot(query(collection(db, 'bookings'), where('uid', '==', u.uid)), s => {
+      myBookings = s.docs.map(d => Object.assign({id:d.id}, d.data())); renderCustomer();
+    }, err));
+  }
+  showView(); renderCustomer(); renderRate();
+}
+
+$('bdate').min = ymd(new Date());
+setMode('login');
+onAuthStateChanged(auth, u => startSession(u));
+</script>
+</body>
+</html>
